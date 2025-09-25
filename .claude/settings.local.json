@@ -21,7 +21,11 @@
       "Bash(git push:*)",
       "Bash(git tag:*)",
       "mcp__github-server__list_commits",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:docs.github.com)",
+      "WebFetch(domain:cli.github.com)",
+      "Bash(gh run view:*)",
+      "Bash(gh run list:*)"
     ],
     "deny": [],
     "ask": []
