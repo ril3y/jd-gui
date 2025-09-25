@@ -1,30 +1,69 @@
-# JD-GUI
+# JD-GUI Enhanced
 
-JD-GUI, a standalone graphical utility that displays Java sources from CLASS files.
+JD-GUI, a standalone graphical utility that displays Java sources from CLASS files with enhanced security analysis capabilities.
 
 ![](https://raw.githubusercontent.com/java-decompiler/jd-gui/master/src/website/img/jd-gui.png)
 
 - Java Decompiler projects home page: [http://java-decompiler.github.io](http://java-decompiler.github.io)
-- JD-GUI source code: [https://github.com/java-decompiler/jd-gui](https://github.com/java-decompiler/jd-gui)
+- Original JD-GUI source code: [https://github.com/java-decompiler/jd-gui](https://github.com/java-decompiler/jd-gui)
 
 ## Description
-JD-GUI is a standalone graphical utility that displays Java source codes of 
+JD-GUI is a standalone graphical utility that displays Java source codes of
 ".class" files. You can browse the reconstructed source code with the JD-GUI
 for instant access to methods and fields.
 
+### Enhanced Features
+- **SHA-256 Hash Generation**: Generate cryptographic hashes for .class files
+- **Security Analysis Integration**: Built-in integration with security analysis services
+- **Multi-file Processing**: Bulk operations on selected files with Ctrl+click support
+- **Enhanced Build System**: Modern Gradle wrapper with Windows executable generation
+
 ## How to build JD-GUI ?
-```
+
+### Prerequisites
+- **Java 8 or higher** (Java 8 recommended for compatibility)
+- **Git** with submodule support
+
+### Build Instructions
+```bash
+# Clone the repository
 > git clone https://github.com/java-decompiler/jd-gui.git
 > cd jd-gui
-> ./gradlew build 
+
+# Initialize and clone the JD-Core submodule (REQUIRED)
+> git submodule init
+> git submodule update
+
+# Build the project
+> ./gradlew build
 ```
-generate :
-- _"build/libs/jd-gui-x.y.z.jar"_
-- _"build/libs/jd-gui-x.y.z-min.jar"_
-- _"build/distributions/jd-gui-windows-x.y.z.zip"_
-- _"build/distributions/jd-gui-osx-x.y.z.tar"_
-- _"build/distributions/jd-gui-x.y.z.deb"_
-- _"build/distributions/jd-gui-x.y.z.rpm"_
+
+### Windows Executable Build
+To build a Windows executable (.exe):
+```bash
+> ./gradlew buildExe
+```
+This generates: `build/launch4j/jd-gui.exe`
+
+### IDE Project Generation
+Generate IDE project files for development:
+```bash
+# Generate IntelliJ IDEA project files
+> ./gradlew idea
+
+# Generate Eclipse project files
+> ./gradlew eclipse
+```
+
+### Build Outputs
+The build process generates:
+- `build/libs/jd-gui-x.y.z.jar` - Main application JAR
+- `build/libs/jd-gui-x.y.z-min.jar` - Minified JAR
+- `build/launch4j/jd-gui.exe` - Windows executable
+- `build/distributions/jd-gui-windows-x.y.z.zip` - Windows distribution
+- `build/distributions/jd-gui-osx-x.y.z.tar` - macOS distribution
+- `build/distributions/jd-gui-x.y.z.deb` - Debian package
+- `build/distributions/jd-gui-x.y.z.rpm` - RPM package
 
 ## How to launch JD-GUI ?
 - Double-click on _"jd-gui-x.y.z.jar"_
