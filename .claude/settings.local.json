@@ -17,7 +17,11 @@
       "Bash(git commit:*)",
       "Bash(JAVA_HOME=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\" PATH=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\\bin:$PATH\" ./gradlew buildExe)",
       "Bash(JAVA_HOME=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\" PATH=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\\bin:$PATH\" ./gradlew clean buildExe)",
-      "Bash(./gradlew:*)"
+      "Bash(./gradlew:*)",
+      "Bash(git push:*)",
+      "Bash(git tag:*)",
+      "mcp__github-server__list_commits",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
