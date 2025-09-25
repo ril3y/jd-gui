@@ -50,6 +50,41 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
         return Collections.emptyList();
     }
 
+    /**
+     * Shared utility method to generate SHA256 hash for any container entry
+     */
+    private static String generateSha256Hash(Container.Entry entry) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            // Try alternative names
+            try {
+                digest = MessageDigest.getInstance("SHA256");
+            } catch (NoSuchAlgorithmException e2) {
+                throw new NoSuchAlgorithmException("SHA-256/SHA256 algorithm not available: " + e.getMessage());
+            }
+        }
+
+        try (InputStream is = entry.getInputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+
+            while ((bytesRead = is.read(buffer)) != -1) {
+                digest.update(buffer, 0, bytesRead);
+            }
+        }
+
+        byte[] hashBytes = digest.digest();
+        StringBuilder sb = new StringBuilder();
+
+        for (byte b : hashBytes) {
+            sb.append(String.format("%02x", b));
+        }
+
+        return sb.toString();
+    }
+
     public static class GenerateSha256Action extends AbstractAction {
         protected static final ImageIcon ICON = new ImageIcon(GenerateSha256Action.class.getClassLoader().getResource("org/jd/gui/images/cpyqual_menu.png"));
 
@@ -69,7 +104,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
 
         public void actionPerformed(ActionEvent e) {
             try {
-                String hash = generateSha256Hash(entry);
+                String hash = Sha256HashContextualActionsFactory.generateSha256Hash(entry);
 
                 // Copy to clipboard
                 Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(hash), null);
@@ -91,38 +126,6 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
                     JOptionPane.ERROR_MESSAGE
                 );
             }
-        }
-
-        private String generateSha256Hash(Container.Entry entry) throws IOException, NoSuchAlgorithmException {
-            MessageDigest digest;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                // Try alternative names
-                try {
-                    digest = MessageDigest.getInstance("SHA256");
-                } catch (NoSuchAlgorithmException e2) {
-                    throw new NoSuchAlgorithmException("SHA-256/SHA256 algorithm not available: " + e.getMessage());
-                }
-            }
-
-            try (InputStream is = entry.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    digest.update(buffer, 0, bytesRead);
-                }
-            }
-
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
         }
     }
 
@@ -150,7 +153,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
                 protected VirusTotalClient.VirusTotalResponse doInBackground() throws Exception {
                     try {
                         // Generate hash
-                        String hash = generateSha256Hash(entry);
+                        String hash = Sha256HashContextualActionsFactory.generateSha256Hash(entry);
 
                         // Get API key from preferences
                         String apiKey = api.getPreferences().get("VirusTotal.apiKey");
@@ -314,38 +317,6 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
                 messageType
             );
         }
-
-        private String generateSha256Hash(Container.Entry entry) throws IOException, NoSuchAlgorithmException {
-            MessageDigest digest;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                // Try alternative names
-                try {
-                    digest = MessageDigest.getInstance("SHA256");
-                } catch (NoSuchAlgorithmException e2) {
-                    throw new NoSuchAlgorithmException("SHA-256/SHA256 algorithm not available: " + e.getMessage());
-                }
-            }
-
-            try (InputStream is = entry.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    digest.update(buffer, 0, bytesRead);
-                }
-            }
-
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
-        }
     }
 
     public static class OpenInVirusTotalAction extends AbstractAction {
@@ -368,7 +339,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
         public void actionPerformed(ActionEvent e) {
             try {
                 // Generate hash
-                String hash = generateSha256Hash(entry);
+                String hash = Sha256HashContextualActionsFactory.generateSha256Hash(entry);
 
                 // VirusTotal file lookup URL
                 String vtUrl = "https://www.virustotal.com/gui/file/" + hash;
@@ -406,38 +377,6 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
                     JOptionPane.ERROR_MESSAGE
                 );
             }
-        }
-
-        private String generateSha256Hash(Container.Entry entry) throws IOException, NoSuchAlgorithmException {
-            MessageDigest digest;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                // Try alternative names
-                try {
-                    digest = MessageDigest.getInstance("SHA256");
-                } catch (NoSuchAlgorithmException e2) {
-                    throw new NoSuchAlgorithmException("SHA-256/SHA256 algorithm not available: " + e.getMessage());
-                }
-            }
-
-            try (InputStream is = entry.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    digest.update(buffer, 0, bytesRead);
-                }
-            }
-
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
         }
     }
 
@@ -674,7 +613,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
 
                         try {
                             // Try to generate hash
-                            String hash = generateSha256Hash(entry);
+                            String hash = Sha256HashContextualActionsFactory.generateSha256Hash(entry);
 
                             // Publish progress
                             publish(new BulkScanResult(filename, hash, "Scanning...", 0, false));
@@ -818,38 +757,6 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
 
             worker.execute();
             progressDialog.setVisible(true);
-        }
-
-        private String generateSha256Hash(Container.Entry entry) throws IOException, NoSuchAlgorithmException {
-            MessageDigest digest;
-            try {
-                digest = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                // Try alternative names
-                try {
-                    digest = MessageDigest.getInstance("SHA256");
-                } catch (NoSuchAlgorithmException e2) {
-                    throw new NoSuchAlgorithmException("SHA-256/SHA256 algorithm not available: " + e.getMessage());
-                }
-            }
-
-            try (InputStream is = entry.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    digest.update(buffer, 0, bytesRead);
-                }
-            }
-
-            byte[] hashBytes = digest.digest();
-            StringBuilder sb = new StringBuilder();
-
-            for (byte b : hashBytes) {
-                sb.append(String.format("%02x", b));
-            }
-
-            return sb.toString();
         }
 
         private void debugLog(String message) {
