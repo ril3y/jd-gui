@@ -126,15 +126,24 @@ public class VirusTotalPreferencesProvider extends JPanel implements Preferences
     @Override
     public void loadPreferences(Map<String, String> preferences) {
         String apiKey = preferences.get(API_KEY_KEY);
-        if (apiKey == null) {
-            apiKey = "";
+
+        // Fallback to environment variable if not in preferences (secure approach)
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            apiKey = System.getenv("VIRUSTOTAL_API_KEY");
+            if (apiKey == null) {
+                apiKey = "";
+            }
         }
         apiKeyTextField.setText(apiKey);
         apiKeyTextField.setCaretPosition(apiKeyTextField.getText().length());
 
         String rateLimit = preferences.get(RATE_LIMIT_KEY);
         if (rateLimit == null) {
-            rateLimit = "1"; // Default to 1 second
+            // Fallback to environment variable
+            rateLimit = System.getenv("VIRUSTOTAL_RATE_LIMIT");
+            if (rateLimit == null) {
+                rateLimit = "1"; // Default to 1 second
+            }
         }
         rateLimitTextField.setText(rateLimit);
     }

@@ -39,7 +39,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
             actions.add(new OpenInVirusTotalAction(api, entry, fragment));
 
             // Add API-based VirusTotal lookup if API key is configured
-            String apiKey = api.getPreferences().get("VirusTotal.apiKey");
+            String apiKey = getVirusTotalApiKey(api);
             if (apiKey != null && !apiKey.trim().isEmpty()) {
                 actions.add(new CheckVirusTotalAction(api, entry, fragment));
                 actions.add(new BulkCheckVirusTotalAction(api, entry, fragment));
@@ -48,6 +48,21 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
             return actions;
         }
         return Collections.emptyList();
+    }
+
+    /**
+     * Safely get VirusTotal API key from preferences with environment variable fallback
+     * This ensures API keys are never hardcoded and can be securely loaded from .env
+     */
+    private static String getVirusTotalApiKey(API api) {
+        String apiKey = api.getPreferences().get("VirusTotal.apiKey");
+
+        // Fallback to environment variable (secure approach)
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            apiKey = System.getenv("VIRUSTOTAL_API_KEY");
+        }
+
+        return apiKey;
     }
 
     /**
@@ -156,7 +171,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
                         String hash = Sha256HashContextualActionsFactory.generateSha256Hash(entry);
 
                         // Get API key from preferences
-                        String apiKey = api.getPreferences().get("VirusTotal.apiKey");
+                        String apiKey = getVirusTotalApiKey(api);
 
                         // Check with VirusTotal
                         VirusTotalClient client = new VirusTotalClient();
@@ -404,7 +419,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
             debugLog("Action triggered for entry: " + entry.getPath());
             debugLog("Fragment: " + fragment);
 
-            String apiKey = api.getPreferences().get("VirusTotal.apiKey");
+            String apiKey = getVirusTotalApiKey(api);
             if (apiKey == null || apiKey.trim().isEmpty()) {
                 debugLog("ERROR: No API key configured");
                 JOptionPane.showMessageDialog(null,
@@ -603,7 +618,7 @@ public class Sha256HashContextualActionsFactory implements ContextualActionsFact
 
                 @Override
                 protected Void doInBackground() throws Exception {
-                    String apiKey = api.getPreferences().get("VirusTotal.apiKey");
+                    String apiKey = getVirusTotalApiKey(api);
                     VirusTotalClient client = new VirusTotalClient();
 
                     for (int i = 0; i < entries.size() && !cancelled && !isCancelled(); i++) {

@@ -88,9 +88,17 @@ Right-click on any `.class` file in the tree view to access:
 Enhanced security analysis with VirusTotal API integration:
 
 #### Setup
+
+**For End Users:**
 1. **Get API Key**: Go to [VirusTotal API Keys](https://www.virustotal.com/gui/my-apikey) and get your free API key
 2. **Configure**: In JD-GUI, go to `File > Preferences > VirusTotal` and enter your API key
 3. **Rate Limiting**: Set appropriate rate limits (1 second for free API, 0.25 for paid)
+
+**For Developers (Secure Setup):**
+1. **Create .env file**: Copy `.env.example` to `.env` in the project root
+2. **Add your API key**: Edit `.env` and add `VIRUSTOTAL_API_KEY=your_actual_key_here`
+3. **Never commit .env**: The `.env` file is gitignored for security
+4. **CI/CD**: GitHub Actions uses `VIRUSTOTAL_API_KEY` secret for testing
 
 #### Available Actions
 Right-click on any `.class` file to access:

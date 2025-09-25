@@ -49,6 +49,8 @@ jobs:
       run: ./gradlew build --no-daemon
 
     - name: Run tests
+      env:
+        VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
       run: ./gradlew test --no-daemon
 
     - name: Build Windows executable (Windows only)
