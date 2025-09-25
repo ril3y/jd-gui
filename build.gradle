@@ -16,7 +16,7 @@ plugins {
 }
 
 // Common configuration //
-rootProject.version='1.6.9-enhanced'
+rootProject.version='1.6.9'
 rootProject.ext.set('jdCoreVersion', '1.1.3')
 targetCompatibility = '1.8'
 

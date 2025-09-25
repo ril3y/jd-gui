@@ -1,2 +1,3 @@
 org.jd.gui.service.actions.CopyQualifiedNameContextualActionsFactory
 org.jd.gui.service.actions.Sha256HashContextualActionsFactory
+org.jd.gui.service.actions.SaveAsContextualActionsFactory

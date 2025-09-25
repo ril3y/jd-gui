@@ -25,7 +25,8 @@
       "WebFetch(domain:docs.github.com)",
       "WebFetch(domain:cli.github.com)",
       "Bash(gh run view:*)",
-      "Bash(gh run list:*)"
+      "Bash(gh run list:*)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
