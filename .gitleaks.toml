@@ -31,37 +31,28 @@ id = "environment-variables"
 description = "Environment variable secrets"
 regex = '''(?i)(export\s+|ENV\s+)([A-Z_]*(?:PASSWORD|SECRET|KEY|TOKEN)[A-Z_]*)=['"]*([^'"\s]{8,})['"]*'''
 
-# Allowlist for test files and known false positives
-[[rules.allowlist]]
-description = "Allow test API keys in test files"
-regex = '''(0123456789abcdef|ABCDEF0123456789|a1b2c3d4e5f6|test[_-]?key|dummy[_-]?key)'''
-paths = [
-  '''.*test.*\.java$''',
-  '''.*Test.*\.java$''',
-  '''.*_test\..*$''',
-  '''.*\.test\..*$''',
-  '''.*tests?/.*$''',
-  '''.*spec\..*$'''
-]
-
-# Global allowlist for obvious test patterns
+# Global allowlist for test patterns and safe files
 [allowlist]
-description = "Global allowlist for test patterns"
+description = "Global allowlist for test patterns and documentation"
 regexes = [
   '''(?i)(test|dummy|fake|example|sample)[_-]?(key|token|secret|password)''',
-  '''(0{8,}|1{8,}|a{8,}|f{8,})''', # Repeated characters
-  '''(0123456789abcdef){2,}''',      # Repeated hex patterns
-  '''[a-f0-9]{64}.*test''',          # Test keys
+  '''(0{8,}|1{8,}|a{8,}|f{8,})''',
+  '''(0123456789abcdef){2,}''',
+  '''[a-f0-9]{64}.*(test|example|dummy)''',
+  '''(ABCDEF0123456789|A1b2C3d4E5f6)''',
 ]
 
 paths = [
-  '''.*\.md$''',           # Documentation files
-  '''.*\.txt$''',          # Text files
-  '''.*\.example$''',      # Example files
-  '''.*\.template$''',     # Template files
-  '''.*\.sample$''',       # Sample files
-  '''.*/test.*$''',        # Test directories
-  '''.*/tests.*$''',       # Tests directories
-  '''.*/examples?.*$''',   # Examples directories
-  '''.*/samples?.*$''',    # Samples directories
+  '''.*\.md$''',
+  '''.*\.txt$''',
+  '''.*\.example$''',
+  '''.*\.template$''',
+  '''.*\.sample$''',
+  '''.*/test.*\.java$''',
+  '''.*/Test.*\.java$''',
+  '''.*test.*\.java$''',
+  '''.*Test.*\.java$''',
+  '''.*/tests?/.*$''',
+  '''.*/examples?/.*$''',
+  '''.*/samples?/.*$''',
 ]
