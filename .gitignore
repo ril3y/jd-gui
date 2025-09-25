@@ -38,3 +38,56 @@ build/
 
 # WinMerge
 *.bak
+
+# Security - Prevent accidental commit of sensitive files
+# API Keys and configuration files
+*.key
+*.pem
+*.p12
+*.pfx
+.env
+.env.*
+!.env.example
+!.env.template
+config.properties
+application-prod.properties
+application-production.properties
+secret.properties
+secrets.yaml
+secrets.yml
+.secrets
+api-keys.txt
+credentials.txt
+
+# Authentication and certificates
+**/secrets/
+**/keys/
+**/certs/
+auth.json
+service-account*.json
+*.jks
+*.keystore
+*.truststore
+
+# IDE and editor files that might contain secrets
+.vscode/settings.json
+.vscode/launch.json
+*.swp
+*.swo
+*~
+
+# Log files that might contain sensitive data
+*.log
+*.log.*
+logs/
+log/
+
+# Backup files
+*.backup
+*.orig
+*.tmp
+*.temp
+
+# Local configuration overrides
+local.properties
+local-*.properties

@@ -1,0 +1,67 @@
+# Gitleaks configuration for JD-GUI Enhanced
+# This file defines custom patterns for detecting secrets and API keys
+
+title = "JD-GUI Enhanced Gitleaks Configuration"
+
+[extend]
+# Include default Gitleaks rules
+useDefault = true
+
+# Custom rules for specific API keys and patterns
+[[rules]]
+id = "virustotal-api-key"
+description = "VirusTotal API Key"
+regex = '''(?i)(virustotal[_-]?api[_-]?key|vt[_-]?key|virus[_-]?total)['":\s=]*['"]*([a-f0-9]{64})['"]*'''
+keywords = ["virustotal", "vtkey", "vt_key"]
+
+[[rules]]
+id = "generic-api-key-64-char"
+description = "Generic 64-character hex API key"
+regex = '''(?i)(api[_-]?key|apikey|key|secret)['":\s=]*['"]*([a-f0-9]{64})['"]*'''
+keywords = ["apikey", "api_key", "secret"]
+
+[[rules]]
+id = "java-properties-secrets"
+description = "Secrets in Java properties files"
+regex = '''(?i)(password|secret|key|token)[=:]\s*['"]*([^'"\s]{8,})['"]*'''
+path = '''\.properties$'''
+
+[[rules]]
+id = "environment-variables"
+description = "Environment variable secrets"
+regex = '''(?i)(export\s+|ENV\s+)([A-Z_]*(?:PASSWORD|SECRET|KEY|TOKEN)[A-Z_]*)=['"]*([^'"\s]{8,})['"]*'''
+
+# Allowlist for test files and known false positives
+[[rules.allowlist]]
+description = "Allow test API keys in test files"
+regex = '''(0123456789abcdef|ABCDEF0123456789|a1b2c3d4e5f6|test[_-]?key|dummy[_-]?key)'''
+paths = [
+  '''.*test.*\.java$''',
+  '''.*Test.*\.java$''',
+  '''.*_test\..*$''',
+  '''.*\.test\..*$''',
+  '''.*tests?/.*$''',
+  '''.*spec\..*$'''
+]
+
+# Global allowlist for obvious test patterns
+[allowlist]
+description = "Global allowlist for test patterns"
+regexes = [
+  '''(?i)(test|dummy|fake|example|sample)[_-]?(key|token|secret|password)''',
+  '''(0{8,}|1{8,}|a{8,}|f{8,})''', # Repeated characters
+  '''(0123456789abcdef){2,}''',      # Repeated hex patterns
+  '''[a-f0-9]{64}.*test''',          # Test keys
+]
+
+paths = [
+  '''.*\.md$''',           # Documentation files
+  '''.*\.txt$''',          # Text files
+  '''.*\.example$''',      # Example files
+  '''.*\.template$''',     # Template files
+  '''.*\.sample$''',       # Sample files
+  '''.*/test.*$''',        # Test directories
+  '''.*/tests.*$''',       # Tests directories
+  '''.*/examples?.*$''',   # Examples directories
+  '''.*/samples?.*$''',    # Samples directories
+]
