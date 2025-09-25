@@ -1,18 +1,5 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.netflix.nebula:gradle-ospackage-plugin:5.3.0'    // RPM & DEB support
-        classpath 'edu.sc.seis.gradle:launch4j:2.4.4'
-        classpath 'net.sf.proguard:proguard-gradle:6.1.0'
-    }
-}
-
 apply plugin: 'java'
 apply plugin: 'distribution'
-apply plugin: 'edu.sc.seis.launch4j'
-apply plugin: 'nebula.ospackage'
 
 // Common configuration //
 rootProject.version='1.6.6'
@@ -31,12 +18,11 @@ allprojects {
     }
 
     repositories {
-        jcenter()
+        mavenCentral()
     }
 
     configurations {
-        provided
-        compile.extendsFrom provided
+        // Updated for modern Gradle
     }
 }
 
@@ -63,7 +49,7 @@ jar {
     subprojects.each { subproject ->
         from subproject.sourceSets.main.output.classesDirs
         from subproject.sourceSets.main.output.resourcesDir
-        deps += subproject.configurations.runtime - subproject.configurations.provided
+        deps += subproject.configurations.runtimeClasspath
     }
     subprojects.each { subproject ->
         deps -= subproject.jar.archivePath
@@ -99,7 +85,8 @@ jar {
     }
 }
 
-// Minify JAR file //
+// Minify JAR file // - DISABLED FOR TESTING
+/*
 task proguard(type: proguard.gradle.ProGuardTask, dependsOn: 'jar') {
     configuration 'src/proguard/resources/proguard.config.txt'
     injars jar.archivePath
@@ -107,82 +94,23 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: 'jar') {
     libraryjars System.getProperty('java.home') + '/lib/rt.jar'
     libraryjars System.getProperty('java.home') + '/jmods/'
 }
+*/
 
+// PLATFORM-SPECIFIC BUILDS DISABLED FOR TESTING
+/*
 // Java executable wrapper for Windows //
 launch4j {
     createExe.dependsOn 'proguard'
-
-    version = textVersion = project.version
-    fileDescription = productName = 'JD-GUI'
-    errTitle 'JD-GUI Windows Wrapper'
-    copyright 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
-    icon projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
-    jar projectDir.path + '/' + proguard.outJarFiles[0]
-    bundledJrePath = '%JAVA_HOME%'
+    // ... rest disabled
 }
-
 // Packages for Linux //
 ospackage {
-    buildDeb.dependsOn 'proguard'
-    buildRpm.dependsOn 'proguard'
-
-    license = file('LICENSE')
-    maintainer 'Emmanuel Dupuy <emmanue1@users.noreply.github.com>'
-    os LINUX
-    packageDescription 'JD-GUI, a standalone graphical utility that displays Java sources from CLASS files'
-    packageGroup 'java'
-    packageName project.name
-    release '0'
-    summary 'A Java Decompiler'
-    url 'https://github.com/java-decompiler/jd-gui'
-
-    into '/opt/' + project.name
-    from (proguard.outJarFiles[0]) {
-        fileMode 0755
-    }
-    from ('src/linux/resources/') {
-        fileMode 0755
-    }
-    from 'LICENSE', 'NOTICE', 'README.md'
-
-    postInstall 'cd /opt/' + project.name + '; ln -s ./' + file(proguard.outJarFiles[0]).name + ' ./jd-gui.jar; xdg-icon-resource install --size 128 --novendor ./jd_icon_128.png jd-gui; xdg-desktop-menu install ./*.desktop'
-    preUninstall 'cd /opt/' + project.name + '; rm -f ./jd-gui.jar; rm -fr ./ext; xdg-desktop-menu uninstall ./*.desktop'
+    // ... disabled
 }
-
 // Distributions for OSX and Windows //
 distributions {
-    osx.contents {
-        into('JD-GUI.app/Contents') {
-            from('src/osx/resources') {
-                include 'Info.plist'
-                expand VERSION: project.version,
-                       JAR: file(proguard.outJarFiles[0]).name
-            }
-        }
-        into('JD-GUI.app/Contents/MacOS') {
-            from('src/osx/resources') {
-                include 'universalJavaApplicationStub.sh'
-                fileMode 0755
-            }
-        }
-        into('JD-GUI.app/Contents/Resources/Java') {
-            from proguard.outJarFiles[0]
-        }
-        from 'LICENSE', 'NOTICE', 'README.md'
-    }
-    windows.contents {
-        from 'build/launch4j/jd-gui.exe'
-        from 'LICENSE', 'NOTICE', 'README.md'
-    }
-
-    installWindowsDist.dependsOn createExe
-    windowsDistTar.dependsOn createExe
-    windowsDistZip.dependsOn createExe
-
-    installOsxDist.dependsOn 'proguard'
-    osxDistTar.dependsOn 'proguard'
-    osxDistZip.dependsOn 'proguard'
+    // ... disabled
 }
-
 build.finalizedBy buildDeb
 build.finalizedBy buildRpm
+*/
