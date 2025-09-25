@@ -1,0 +1,167 @@
+name: Build and Release JD-GUI Enhanced
+
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Set up JDK 8
+      uses: actions/setup-java@v4
+      with:
+        java-version: '8'
+        distribution: 'temurin'
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+
+    - name: Initialize submodules
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Build JAR
+      run: ./gradlew build --no-daemon
+
+    - name: Build Windows Executable
+      run: ./gradlew buildExe --no-daemon
+
+    - name: Run tests
+      run: ./gradlew test --no-daemon
+
+    - name: Upload JAR artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: jd-gui-jar
+        path: build/libs/*.jar
+
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v4
+      with:
+        name: jd-gui-windows-exe
+        path: build/launch4j/jd-gui.exe
+
+    - name: Upload distributions
+      uses: actions/upload-artifact@v4
+      with:
+        name: jd-gui-distributions
+        path: build/distributions/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download JAR artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: jd-gui-jar
+        path: ./artifacts/
+
+    - name: Download Windows executable
+      uses: actions/download-artifact@v4
+      with:
+        name: jd-gui-windows-exe
+        path: ./artifacts/
+
+    - name: Download distributions
+      uses: actions/download-artifact@v4
+      with:
+        name: jd-gui-distributions
+        path: ./artifacts/
+
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: JD-GUI Enhanced ${{ steps.version.outputs.VERSION }}
+        draft: false
+        prerelease: false
+        body: |
+          # JD-GUI Enhanced ${{ steps.version.outputs.VERSION }}
+
+          ## 🚀 Enhanced Features
+          - **SHA-256 Hash Generation**: Generate cryptographic hashes for .class files
+          - **VirusTotal Integration**: Direct API integration for malware detection and security analysis
+          - **Multi-file Processing**: Bulk security scanning with Ctrl+click multi-select support
+          - **Windows Executable**: Native Windows .exe with Launch4j wrapper
+          - **Consolidated Architecture**: Optimized codebase with eliminated duplicate implementations
+
+          ## 📦 Downloads
+          - **Windows Executable**: `jd-gui.exe` - Ready to run on Windows
+          - **Cross-Platform JAR**: `jd-gui-*.jar` - Runs on any Java 8+ environment
+          - **Linux Packages**: `.deb` and `.rpm` packages available
+          - **macOS Distribution**: `.tar` archive for macOS
+
+          ## 🔧 VirusTotal Setup
+          1. Get your free API key from [VirusTotal](https://www.virustotal.com/gui/my-apikey)
+          2. In JD-GUI: `File > Preferences > VirusTotal`
+          3. Enter your API key and set rate limiting
+          4. Right-click on .class files for security analysis options
+
+          ## 🏗️ Building from Source
+          ```bash
+          git clone https://github.com/ril3y/jd-gui.git
+          cd jd-gui
+          git submodule init && git submodule update
+          ./gradlew buildExe
+          ```
+
+          For detailed documentation, see the [README](https://github.com/ril3y/jd-gui/blob/master/README.md).
+
+    - name: Upload Windows Executable
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/jd-gui.exe
+        asset_name: jd-gui.exe
+        asset_content_type: application/octet-stream
+
+    - name: Upload JAR
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifacts/jd-gui-1.6.7-enhanced.jar
+        asset_name: jd-gui-1.6.7-enhanced.jar
+        asset_content_type: application/java-archive
