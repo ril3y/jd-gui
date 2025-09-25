@@ -148,8 +148,8 @@ jobs:
       with:
         name: jd-gui-${{ steps.new_version.outputs.version }}
         path: |
-          build/libs/*.jar
-          build/launch4j/jd-gui.exe
+          build/libs/
+          build/launch4j/
 
     outputs:
       new_version: ${{ steps.new_version.outputs.version }}
@@ -218,7 +218,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/jd-gui.exe
+        asset_path: ./artifacts/launch4j/jd-gui.exe
         asset_name: jd-gui.exe
         asset_content_type: application/octet-stream
 
@@ -228,6 +228,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/jd-gui-${{ needs.auto-version.outputs.new_version }}.jar
+        asset_path: ./artifacts/libs/jd-gui-${{ needs.auto-version.outputs.new_version }}.jar
         asset_name: jd-gui-${{ needs.auto-version.outputs.new_version }}.jar
         asset_content_type: application/java-archive
