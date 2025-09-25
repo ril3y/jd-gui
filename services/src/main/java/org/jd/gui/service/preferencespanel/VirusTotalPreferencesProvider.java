@@ -19,10 +19,12 @@ import java.util.Map;
 
 public class VirusTotalPreferencesProvider extends JPanel implements PreferencesPanel, DocumentListener {
     protected static final String API_KEY_KEY = "VirusTotal.apiKey";
+    protected static final String RATE_LIMIT_KEY = "VirusTotal.rateLimitSeconds";
     protected static final String VT_API_URL = "https://www.virustotal.com/gui/my-apikey";
 
     protected PreferencesPanel.PreferencesPanelChangeListener listener = null;
     protected JTextField apiKeyTextField;
+    protected JTextField rateLimitTextField;
     protected Color errorBackgroundColor = Color.RED;
     protected Color defaultBackgroundColor;
 
@@ -68,8 +70,30 @@ public class VirusTotalPreferencesProvider extends JPanel implements Preferences
         });
         mainPanel.add(helpButton, gbc);
 
-        // Instructions
+        // Rate limit label and field
         gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        mainPanel.add(new JLabel("Rate Limit (seconds):"), gbc);
+
+        gbc.gridx = 1; gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        rateLimitTextField = new JTextField("1", 10);
+        rateLimitTextField.getDocument().addDocumentListener(this);
+        mainPanel.add(rateLimitTextField, gbc);
+
+        gbc.gridx = 2; gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0.0;
+        JLabel rateLimitHelpLabel = new JLabel("(1 for free API, 0.25 for paid)");
+        rateLimitHelpLabel.setFont(rateLimitHelpLabel.getFont().deriveFont(Font.ITALIC, 10f));
+        mainPanel.add(rateLimitHelpLabel, gbc);
+
+        // Instructions
+        gbc.gridx = 0; gbc.gridy = 2;
         gbc.gridwidth = 3;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 5, 5, 5);
@@ -107,6 +131,12 @@ public class VirusTotalPreferencesProvider extends JPanel implements Preferences
         }
         apiKeyTextField.setText(apiKey);
         apiKeyTextField.setCaretPosition(apiKeyTextField.getText().length());
+
+        String rateLimit = preferences.get(RATE_LIMIT_KEY);
+        if (rateLimit == null) {
+            rateLimit = "1"; // Default to 1 second
+        }
+        rateLimitTextField.setText(rateLimit);
     }
 
     @Override
@@ -116,6 +146,13 @@ public class VirusTotalPreferencesProvider extends JPanel implements Preferences
             preferences.put(API_KEY_KEY, apiKey);
         } else {
             preferences.remove(API_KEY_KEY);
+        }
+
+        String rateLimit = rateLimitTextField.getText().trim();
+        if (!rateLimit.isEmpty()) {
+            preferences.put(RATE_LIMIT_KEY, rateLimit);
+        } else {
+            preferences.put(RATE_LIMIT_KEY, "1"); // Default fallback
         }
     }
 
@@ -127,7 +164,19 @@ public class VirusTotalPreferencesProvider extends JPanel implements Preferences
             return true;
         }
         // Basic validation: VirusTotal API keys are typically 64-character hex strings
-        return apiKey.matches("[a-fA-F0-9]{64}");
+        boolean apiKeyValid = apiKey.matches("[a-fA-F0-9]{64}");
+
+        // Validate rate limit
+        String rateLimit = rateLimitTextField.getText().trim();
+        boolean rateLimitValid = true;
+        try {
+            double rate = Double.parseDouble(rateLimit);
+            rateLimitValid = rate > 0 && rate <= 60; // Between 0 and 60 seconds
+        } catch (NumberFormatException e) {
+            rateLimitValid = false;
+        }
+
+        return apiKeyValid && rateLimitValid;
     }
 
     @Override

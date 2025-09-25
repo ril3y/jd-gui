@@ -22,11 +22,13 @@ public class VirusTotalClient {
     private static final int TIMEOUT_MS = 30000; // 30 seconds
 
     // Regex patterns for extracting key information from JSON response
-    private static final Pattern STATS_PATTERN = Pattern.compile("\"stats\"\\s*:\\s*\\{([^}]+)\\}");
+    // VirusTotal API v3 uses "last_analysis_stats" instead of just "stats"
+    private static final Pattern STATS_PATTERN = Pattern.compile("\"last_analysis_stats\"\\s*:\\s*\\{([^}]+)\\}");
     private static final Pattern MALICIOUS_PATTERN = Pattern.compile("\"malicious\"\\s*:\\s*(\\d+)");
     private static final Pattern SUSPICIOUS_PATTERN = Pattern.compile("\"suspicious\"\\s*:\\s*(\\d+)");
     private static final Pattern UNDETECTED_PATTERN = Pattern.compile("\"undetected\"\\s*:\\s*(\\d+)");
     private static final Pattern HARMLESS_PATTERN = Pattern.compile("\"harmless\"\\s*:\\s*(\\d+)");
+    // Reputation is in attributes section, not stats
     private static final Pattern REPUTATION_PATTERN = Pattern.compile("\"reputation\"\\s*:\\s*(-?\\d+)");
 
     public static class VirusTotalResponse {
@@ -163,10 +165,10 @@ public class VirusTotalClient {
 
     private VirusTotalResponse parseResponse(String json) {
         try {
-            // Extract stats section
+            // Extract stats section - VirusTotal API v3 uses "last_analysis_stats"
             Matcher statsMatcher = STATS_PATTERN.matcher(json);
             if (!statsMatcher.find()) {
-                return new VirusTotalResponse("Unable to parse VirusTotal response");
+                return new VirusTotalResponse("Unable to parse VirusTotal response - no analysis stats found");
             }
 
             String statsSection = statsMatcher.group(1);

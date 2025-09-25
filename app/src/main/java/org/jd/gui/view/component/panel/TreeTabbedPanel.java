@@ -83,10 +83,35 @@ public class TreeTabbedPanel<T extends DefaultMutableTreeNode & ContainerEntryGe
                     TreePath path = tree.getPathForLocation(e.getX(), e.getY());
 
                     if (path != null) {
-                        tree.setSelectionPath(path);
+                        // Preserve multi-selection - only change selection if right-clicked item is not selected
+                        if (!tree.isPathSelected(path)) {
+                            tree.setSelectionPath(path);
+                        }
 
                         T node = (T)path.getLastPathComponent();
-                        Collection<Action> actions = api.getContextualActions(node.getEntry(), node.getUri().getFragment());
+
+                        // Create fragment with multi-select info for contextual actions
+                        String fragmentWithSelection = node.getUri().getFragment();
+                        try {
+                            TreePath[] selectedPaths = tree.getSelectionPaths();
+                            if (selectedPaths != null && selectedPaths.length > 1) {
+                                StringBuilder selectionInfo = new StringBuilder();
+                                for (TreePath treePath : selectedPaths) {
+                                    T selectedNode = (T)treePath.getLastPathComponent();
+                                    if (selectedNode != null && selectedNode.getEntry() != null) {
+                                        if (selectionInfo.length() > 0) selectionInfo.append(";");
+                                        selectionInfo.append(selectedNode.getEntry().getPath());
+                                    }
+                                }
+                                if (selectionInfo.length() > 0) {
+                                    fragmentWithSelection = (fragmentWithSelection != null ? fragmentWithSelection : "") + "#multiselect=" + selectionInfo.toString();
+                                }
+                            }
+                        } catch (Exception ex) {
+                            // If there's any issue, just use original fragment
+                        }
+
+                        Collection<Action> actions = api.getContextualActions(node.getEntry(), fragmentWithSelection);
 
                         if (actions != null) {
                             JPopupMenu popup = new JPopupMenu();
