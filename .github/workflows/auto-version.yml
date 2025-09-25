@@ -196,7 +196,7 @@ jobs:
           - **Consolidated Architecture**: Optimized codebase with eliminated duplications
 
           ## Downloads
-          - **Windows Executable**: `jd-gui.exe` - Ready to run on Windows
+          - **Windows Executable**: `jd-gui-*-windows.zip` - Windows executable (extract and run jd-gui.exe)
           - **Cross-Platform JAR**: `jd-gui-*.jar` - Runs on any Java 8+ environment
 
           ## VirusTotal Setup
@@ -212,15 +212,20 @@ jobs:
 
           For detailed documentation, see the [README](https://github.com/ril3y/jd-gui/blob/master/README.md).
 
-    - name: Upload Windows Executable
+    - name: Create Windows ZIP
+      run: |
+        cd ./artifacts/launch4j/
+        zip jd-gui-${{ needs.auto-version.outputs.new_version }}-windows.zip jd-gui.exe
+
+    - name: Upload Windows Executable ZIP
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./artifacts/launch4j/jd-gui.exe
-        asset_name: jd-gui.exe
-        asset_content_type: application/octet-stream
+        asset_path: ./artifacts/launch4j/jd-gui-${{ needs.auto-version.outputs.new_version }}-windows.zip
+        asset_name: jd-gui-${{ needs.auto-version.outputs.new_version }}-windows.zip
+        asset_content_type: application/zip
 
     - name: Upload JAR
       uses: actions/upload-release-asset@v1
