@@ -4,7 +4,14 @@
       "Bash(JAVA_HOME=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\" PATH=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\\bin:$PATH\" ./gradlew build)",
       "Bash(git submodule add:*)",
       "Bash(git submodule:*)",
-      "Bash(JAVA_HOME=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\" PATH=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\\bin:$PATH\" ./gradlew jar)"
+      "Bash(JAVA_HOME=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\" PATH=\"C:\\Program Files\\OpenLogic\\jdk-8.0.462.08-hotspot\\bin:$PATH\" ./gradlew jar)",
+      "Bash(tree:*)",
+      "Bash(.gradlew build)",
+      "Bash(gradlew.bat build:*)",
+      "Bash(find:*)",
+      "Bash(java:*)",
+      "Bash(javac:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
