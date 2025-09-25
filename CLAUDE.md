@@ -14,6 +14,12 @@ JD-GUI is a standalone Java Swing desktop application for displaying Java source
 # Build the entire project
 ./gradlew build
 
+# Build just the JAR (faster)
+./gradlew jar
+
+# Build Windows executable with SHA256 feature
+./gradlew buildExe
+
 # Run tests
 ./gradlew test
 
@@ -25,6 +31,8 @@ JD-GUI is a standalone Java Swing desktop application for displaying Java source
 ./gradlew run
 # Or from built JAR:
 java -jar build/libs/jd-gui-1.6.6.jar
+# Or from Windows executable:
+./build/launch4j/jd-gui.exe
 ```
 
 ## Project Architecture

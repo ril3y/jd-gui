@@ -111,18 +111,43 @@ task proguard(type: proguard.gradle.ProGuardTask, dependsOn: 'jar') {
 }
 */
 
-// PLATFORM-SPECIFIC PACKAGING DISABLED FOR BASIC BUILD
-/*
 // Java executable wrapper for Windows //
 launch4j {
-    createExe.dependsOn 'proguard'
-    // ... rest disabled
+    // Use the regular JAR task instead of proguard
+    jarTask = project.tasks.jar
+
+    version = project.version
+    textVersion = project.version
+    fileDescription = 'JD-GUI Java Decompiler'
+    productName = 'JD-GUI'
+    copyright = 'JD-GUI (C) 2008-2019 Emmanuel Dupuy'
+    icon = projectDir.path + '/src/launch4j/resources/images/jd-gui.ico'
+    bundledJrePath = '%JAVA_HOME%'
+    jreMinVersion = '1.8.0'
 }
-// Packages for Linux //
+
+// Custom task to build Windows executable easily
+task buildExe {
+    dependsOn createExe
+    group = 'build'
+    description = 'Builds Windows executable (.exe) with SHA256 hash feature'
+
+    doLast {
+        println "✅ Windows executable created successfully!"
+        println "📁 Location: ${projectDir}/build/launch4j/jd-gui.exe"
+        println "🚀 Ready to run on Windows!"
+    }
+}
+
+// Packages for Linux // - STILL DISABLED
+/*
 ospackage {
     // ... disabled
 }
 */
+
+// DISTRIBUTIONS ALSO DISABLED FOR BASIC BUILD
+/*
 // Distributions for OSX and Windows //
 distributions {
     // ... disabled
