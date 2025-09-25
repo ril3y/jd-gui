@@ -38,9 +38,12 @@ jobs:
     - name: Determine version bump type
       id: version_type
       run: |
-        if [[ "${{ github.event.head_commit.message }}" == *"[major]"* ]]; then
+        commit_msg="${{ github.event.head_commit.message }}"
+        if [[ "$commit_msg" == *"[major]"* ]]; then
           echo "type=major" >> $GITHUB_OUTPUT
-        elif [[ "${{ github.event.head_commit.message }}" == *"[minor]"* ]] || [[ "${{ github.event.head_commit.message }}" == *"feat"* ]] || [[ "${{ github.event.head_commit.message }}" == *"feature"* ]]; then
+        elif [[ "$commit_msg" == *"[minor]"* ]]; then
+          echo "type=minor" >> $GITHUB_OUTPUT
+        elif [[ "$commit_msg" == *"feat"* ]] || [[ "$commit_msg" == *"feature"* ]]; then
           echo "type=minor" >> $GITHUB_OUTPUT
         else
           echo "type=patch" >> $GITHUB_OUTPUT
@@ -56,10 +59,10 @@ jobs:
         base_version=$(echo "$current" | cut -d'-' -f1)
         suffix=$(echo "$current" | cut -d'-' -f2-)
 
-        IFS='.' read -ra VERSION_PARTS <<< "$base_version"
-        major=${VERSION_PARTS[0]}
-        minor=${VERSION_PARTS[1]}
-        patch=${VERSION_PARTS[2]}
+        # Parse version components
+        major=$(echo "$base_version" | cut -d'.' -f1)
+        minor=$(echo "$base_version" | cut -d'.' -f2)
+        patch=$(echo "$base_version" | cut -d'.' -f3)
 
         case $type in
           major)
